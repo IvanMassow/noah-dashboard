@@ -500,31 +500,64 @@ body {
             </a>
         </div>
 
-        <div class="summary-strip" id="poly-summary">
-            <div class="summary-card">
-                <div class="summary-card-value teal" id="poly-total">--</div>
-                <div class="summary-card-label">Tracked</div>
+        <!-- SHORT TAIL -->
+        <div style="margin-bottom:0.5rem">
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ink);margin:0 0 0.6rem">Short Tail <span style="font-size:0.72rem;font-weight:400;color:var(--ink-light)">&mdash; 16h window, ~400 articles</span></h3>
+            <div class="summary-strip" id="poly-short-summary">
+                <div class="summary-card">
+                    <div class="summary-card-value teal" id="poly-short-total">--</div>
+                    <div class="summary-card-label">Tracked</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value green" id="poly-short-winners">--</div>
+                    <div class="summary-card-label">Winners</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value red" id="poly-short-losers">--</div>
+                    <div class="summary-card-label">Losers</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value" id="poly-short-winrate">--</div>
+                    <div class="summary-card-label">Win Rate</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value" id="poly-short-best">--</div>
+                    <div class="summary-card-label">Best Trade</div>
+                </div>
             </div>
-            <div class="summary-card">
-                <div class="summary-card-value green" id="poly-winners">--</div>
-                <div class="summary-card-label">Winners</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value red" id="poly-losers">--</div>
-                <div class="summary-card-label">Losers</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="poly-winrate">--</div>
-                <div class="summary-card-label">Win Rate</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="poly-best">--</div>
-                <div class="summary-card-label">Best Trade</div>
+            <div id="poly-short-trades">
+                <div class="loading-state"><span class="loading-spinner"></span> Loading&hellip;</div>
             </div>
         </div>
 
-        <div id="poly-trades">
-            <div class="loading-state"><span class="loading-spinner"></span> Loading PolyHunter data&hellip;</div>
+        <!-- LONG TAIL -->
+        <div style="margin-top:1.5rem">
+            <h3 style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--ink);margin:0 0 0.6rem">Long Tail <span style="font-size:0.72rem;font-weight:400;color:var(--ink-light)">&mdash; 8-day window, ~35 curated articles</span></h3>
+            <div class="summary-strip" id="poly-long-summary">
+                <div class="summary-card">
+                    <div class="summary-card-value teal" id="poly-long-total">--</div>
+                    <div class="summary-card-label">Tracked</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value green" id="poly-long-winners">--</div>
+                    <div class="summary-card-label">Winners</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value red" id="poly-long-losers">--</div>
+                    <div class="summary-card-label">Losers</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value" id="poly-long-winrate">--</div>
+                    <div class="summary-card-label">Win Rate</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-value" id="poly-long-best">--</div>
+                    <div class="summary-card-label">Best Trade</div>
+                </div>
+            </div>
+            <div id="poly-long-trades">
+                <div class="loading-state"><span class="loading-spinner"></span> Loading&hellip;</div>
+            </div>
         </div>
 
         <div class="last-updated" id="poly-updated"></div>
@@ -752,19 +785,10 @@ function escHtml(s) {
 }
 
 // ========= POLY HUNTER =========
-function renderPoly(data) {
-    document.getElementById('poly-total').textContent = data.total_candidates || 0;
-    document.getElementById('poly-winners').textContent = data.winners || 0;
-    document.getElementById('poly-losers').textContent = data.losers || 0;
-    document.getElementById('poly-winrate').textContent = (data.win_rate || 0).toFixed(1) + '%';
-    document.getElementById('poly-best').innerHTML = formatPnl(data.best_trade || 0);
-    document.getElementById('poly-updated').textContent = 'Updated ' + timeAgo(data.updated_at);
-
-    var positions = data.recent_positions || data.active_trades || [];
-    var container = document.getElementById('poly-trades');
-
-    if (positions.length === 0) {
-        container.innerHTML = '<div class="loading-state" style="opacity:0.6">No data available yet</div>';
+function renderPolyTable(positions, containerId) {
+    var container = document.getElementById(containerId);
+    if (!positions || positions.length === 0) {
+        container.innerHTML = '<div class="loading-state" style="opacity:0.6">No candidates yet</div>';
         return;
     }
 
@@ -796,6 +820,41 @@ function renderPoly(data) {
 
     html += '</tbody></table></div>';
     container.innerHTML = html;
+}
+
+function renderPoly(data) {
+    document.getElementById('poly-updated').textContent = 'Updated ' + timeAgo(data.updated_at);
+
+    // Per-tail summary stats
+    var st = data.short_tail || {};
+    var lt = data.long_tail || {};
+
+    document.getElementById('poly-short-total').textContent = st.total || 0;
+    document.getElementById('poly-short-winners').textContent = st.winners || 0;
+    document.getElementById('poly-short-losers').textContent = st.losers || 0;
+    document.getElementById('poly-short-winrate').textContent = (st.win_rate || 0).toFixed(1) + '%';
+    document.getElementById('poly-short-best').innerHTML = formatPnl(st.best_trade || 0);
+
+    document.getElementById('poly-long-total').textContent = lt.total || 0;
+    document.getElementById('poly-long-winners').textContent = lt.winners || 0;
+    document.getElementById('poly-long-losers').textContent = lt.losers || 0;
+    document.getElementById('poly-long-winrate').textContent = (lt.win_rate || 0).toFixed(1) + '%';
+    document.getElementById('poly-long-best').innerHTML = formatPnl(lt.best_trade || 0);
+
+    // Split positions by tail_type
+    var positions = data.recent_positions || [];
+    var shortPositions = [];
+    var longPositions = [];
+    for (var i = 0; i < positions.length; i++) {
+        if (positions[i].tail_type === 'long') {
+            longPositions.push(positions[i]);
+        } else {
+            shortPositions.push(positions[i]);
+        }
+    }
+
+    renderPolyTable(shortPositions, 'poly-short-trades');
+    renderPolyTable(longPositions, 'poly-long-trades');
 }
 
 // ========= HEDGE FUND =========
