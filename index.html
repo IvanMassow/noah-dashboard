@@ -889,7 +889,16 @@ function updateHero(polyData, hedgeData, cwData) {
     var activeCW = (cwData && cwData.active && cwData.active.state === 'HELD') ? 1 : 0;
     document.getElementById('hero-active').textContent = activePoly + activeHedge + activeCW;
 
-    var wr = (polyData && polyData.win_rate) || 0;
+    // Blended win rate across all systems
+    var wrPoly = (polyData && polyData.win_rate) || 0;
+    var wrHedge = (hedgeData && hedgeData.win_rate) || 0;
+    var wrCW = (cwData && cwData.win_rate) || 0;
+    var wrCount = 0;
+    var wrSum = 0;
+    if (wrPoly > 0) { wrSum += wrPoly; wrCount++; }
+    if (wrHedge > 0) { wrSum += wrHedge; wrCount++; }
+    if (wrCW > 0) { wrSum += wrCW; wrCount++; }
+    var wr = wrCount > 0 ? wrSum / wrCount : 0;
     var wrEl = document.getElementById('hero-winrate');
     wrEl.textContent = wr.toFixed(1) + '%';
     wrEl.className = 'hero-stat-value ' + (wr >= 50 ? 'green' : wr > 0 ? '' : '');
