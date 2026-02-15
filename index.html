@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOAH — Signal Intelligence Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --paper: #FFF1E5;
+    --paper-dark: #f5e6d3;
+    --ink: #33302e;
+    --ink-light: #66605c;
+    --teal: #0d7680;
+    --teal-light: #0f8f9a;
+    --teal-bg: #e8f5f5;
+    --salmon: #ff8c69;
+    --gold: #d97706;
+    --gold-bg: #fef3c7;
+    --green: #16a34a;
+    --green-bg: #dcfce7;
+    --red: #cc0000;
+    --red-bg: #fef2f2;
+    --purple: #7c3aed;
+    --amber: #d97706;
+    --dark-purple: #5b21b6;
+    --border: #e0d5c7;
+    --shadow: rgba(51, 48, 46, 0.08);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* --- NAV --- */
+.nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: var(--ink);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1.3rem;
+    color: var(--paper);
+    letter-spacing: 2px;
+}
+.nav-logo span { color: var(--salmon); }
+.nav-links { display: flex; gap: 20px; align-items: center; }
+.nav-links a {
+    color: var(--paper);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    opacity: 0.75;
+    transition: opacity 0.2s;
+}
+.nav-links a:hover { opacity: 1; }
+.nav-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.nav-live { background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* --- HERO --- */
+.hero {
+    margin-top: 52px;
+    background: linear-gradient(135deg, var(--ink) 0%, #1a1817 100%);
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 50px,
+        rgba(255,255,255,0.015) 50px,
+        rgba(255,255,255,0.015) 51px
+    );
+}
+.hero-content { position: relative; z-index: 1; }
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--paper);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+}
+.hero h1 span { color: var(--salmon); }
+.hero-sub {
+    font-weight: 300;
+    font-size: 0.92rem;
+    color: rgba(255,241,229,0.55);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+.hero-stat {
+    text-align: center;
+}
+.hero-stat-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--paper);
+}
+.hero-stat-value.green { color: var(--green); }
+.hero-stat-value.red { color: var(--salmon); }
+.hero-stat-value.teal { color: var(--teal-light); }
+.hero-stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255,241,229,0.45);
+    margin-top: 2px;
+}
+
+/* --- MAIN CONTENT --- */
+.main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+}
+
+/* --- SECTION --- */
+.section {
+    margin-bottom: 36px;
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--teal);
+    padding-bottom: 10px;
+}
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+.section-title .system-tag {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+.tag-poly { background: var(--teal-bg); color: var(--teal); }
+.tag-hedge { background: var(--gold-bg); color: var(--gold); }
+.section-link {
+    font-size: 0.78rem;
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+.section-link:hover { text-decoration: underline; }
+
+/* --- SUMMARY STRIP --- */
+.summary-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.summary-card {
+    flex: 1;
+    min-width: 120px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-align: center;
+}
+.summary-card-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+}
+.summary-card-value.green { color: var(--green); }
+.summary-card-value.red { color: var(--red); }
+.summary-card-value.teal { color: var(--teal); }
+.summary-card-value.gold { color: var(--gold); }
+.summary-card-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-light);
+    margin-top: 3px;
+}
+
+/* --- TRADE TABLE --- */
+.trade-table-wrap {
+    overflow-x: auto;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+.trade-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+.trade-table thead th {
+    background: var(--paper-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-light);
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+.trade-table tbody td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f0ebe4;
+    vertical-align: middle;
+}
+.trade-table tbody tr:last-child td { border-bottom: none; }
+.trade-table tbody tr:hover { background: rgba(13, 118, 128, 0.03); }
+
+/* Cell styles */
+.asset-cell {
+    font-weight: 600;
+    color: var(--ink);
+    max-width: 280px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ticker-cell {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--teal);
+}
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.badge-long { background: var(--green-bg); color: var(--green); }
+.badge-short { background: var(--red-bg); color: var(--red); }
+.badge-higher { background: var(--green-bg); color: var(--green); }
+.badge-lower { background: var(--red-bg); color: var(--red); }
+.badge-active { background: var(--green-bg); color: var(--green); }
+.badge-publish { background: var(--gold-bg); color: var(--gold); }
+.badge-watch { background: #f3e8ff; color: var(--purple); }
+.badge-pending { background: #f1f5f9; color: #9ea2b0; }
+
+.band-chip {
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 4px;
+    color: white;
+}
+
+.pnl-positive { color: var(--green); font-weight: 700; }
+.pnl-negative { color: var(--red); font-weight: 700; }
+.pnl-flat { color: var(--ink-light); }
+
+.confidence-bar {
+    display: inline-block;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--teal);
+    vertical-align: middle;
+}
+.confidence-bar-bg {
+    display: inline-block;
+    width: 50px;
+    height: 6px;
+    border-radius: 3px;
+    background: #e8e2db;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* --- STATUS DOT --- */
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.dot-green { background: var(--green); }
+.dot-red { background: var(--red); }
+.dot-orange { background: #f59e0b; }
+.dot-grey { background: #9ea2b0; }
+
+/* --- EMPTY STATE --- */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.empty-state-icon {
+    font-size: 2.4rem;
+    margin-bottom: 10px;
+    opacity: 0.4;
+}
+.empty-state-text {
+    font-size: 0.92rem;
+    color: var(--ink-light);
+}
+.empty-state-sub {
+    font-size: 0.78rem;
+    color: var(--ink-light);
+    opacity: 0.6;
+    margin-top: 6px;
+}
+
+/* --- FOOTER --- */
+.footer {
+    background: var(--ink);
+    padding: 28px 24px;
+    text-align: center;
+}
+.footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--paper);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+.footer-logo span { color: var(--salmon); }
+.footer-text {
+    font-size: 0.72rem;
+    color: rgba(255,241,229,0.35);
+    letter-spacing: 0.5px;
+}
+.footer-text a { color: rgba(255,241,229,0.5); text-decoration: none; }
+.footer-text a:hover { text-decoration: underline; }
+
+/* --- LAST UPDATED --- */
+.last-updated {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--ink-light);
+    opacity: 0.6;
+    margin-top: 8px;
+}
+
+/* --- LOADING --- */
+.loading-spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--teal);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--ink-light);
+    font-size: 0.85rem;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 700px) {
+    .hero h1 { font-size: 1.6rem; }
+    .hero-stats { gap: 20px; }
+    .hero-stat-value { font-size: 1.2rem; }
+    .summary-strip { gap: 10px; }
+    .summary-card { min-width: 90px; padding: 10px; }
+    .summary-card-value { font-size: 1.1rem; }
+    .section-title { font-size: 1.1rem; }
+    .trade-table { font-size: 0.78rem; }
+    .trade-table thead th { padding: 10px; }
+    .trade-table tbody td { padding: 9px 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+    <div class="nav-logo">N<span>O</span>AH</div>
+    <div class="nav-links">
+        <a href="#polyhunter"><span class="nav-dot nav-live"></span>Poly</a>
+        <a href="#hedgefund"><span class="nav-dot nav-live"></span>Hedge</a>
+        <a href="https://ivanmassow.github.io/polyhunter/" target="_blank">Full Poly Report</a>
+        <a href="https://ivanmassow.github.io/hedgefund-tracker/" target="_blank">Full Hedge Report</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+    <div class="hero-content">
+        <h1>N<span>O</span>AH</h1>
+        <p class="hero-sub">Signal Intelligence Dashboard</p>
+        <div class="hero-stats" id="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value teal" id="hero-total">--</div>
+                <div class="hero-stat-label">Total Positions</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value green" id="hero-active">--</div>
+                <div class="hero-stat-label">Active Trades</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value" id="hero-winrate">--</div>
+                <div class="hero-stat-label">Win Rate</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value" id="hero-systems">2</div>
+                <div class="hero-stat-label">Live Systems</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="main">
+
+    <!-- POLYHUNTER SECTION -->
+    <section class="section" id="polyhunter">
+        <div class="section-header">
+            <div class="section-title">
+                Prediction Markets
+                <span class="system-tag tag-poly">PolyHunter</span>
+            </div>
+            <a class="section-link" href="https://ivanmassow.github.io/polyhunter/" target="_blank">Full Report &rarr;</a>
+        </div>
+
+        <div class="summary-strip" id="poly-summary">
+            <div class="summary-card">
+                <div class="summary-card-value teal" id="poly-total">--</div>
+                <div class="summary-card-label">Tracked</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value green" id="poly-winners">--</div>
+                <div class="summary-card-label">Winners</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value red" id="poly-losers">--</div>
+                <div class="summary-card-label">Losers</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="poly-winrate">--</div>
+                <div class="summary-card-label">Win Rate</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="poly-best">--</div>
+                <div class="summary-card-label">Best Trade</div>
+            </div>
+        </div>
+
+        <div id="poly-trades">
+            <div class="loading-state"><span class="loading-spinner"></span> Loading PolyHunter data&hellip;</div>
+        </div>
+
+        <div class="last-updated" id="poly-updated"></div>
+    </section>
+
+    <!-- HEDGE FUND SECTION -->
+    <section class="section" id="hedgefund">
+        <div class="section-header">
+            <div class="section-title">
+                Equity Signals
+                <span class="system-tag tag-hedge">Hedge Fund</span>
+            </div>
+            <a class="section-link" href="https://ivanmassow.github.io/hedgefund-tracker/" target="_blank">Full Report &rarr;</a>
+        </div>
+
+        <div class="summary-strip" id="hedge-summary">
+            <div class="summary-card">
+                <div class="summary-card-value teal" id="hedge-total">--</div>
+                <div class="summary-card-label">Positions</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value green" id="hedge-active">--</div>
+                <div class="summary-card-label">Active</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value gold" id="hedge-publish">--</div>
+                <div class="summary-card-label">Publish</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="hedge-pending">--</div>
+                <div class="summary-card-label">Pending DD</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="hedge-directions">--</div>
+                <div class="summary-card-label">Long / Short</div>
+            </div>
+        </div>
+
+        <div id="hedge-trades">
+            <div class="loading-state"><span class="loading-spinner"></span> Loading Hedge Fund data&hellip;</div>
+        </div>
+
+        <div class="last-updated" id="hedge-updated"></div>
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-logo">N<span>O</span>AH</div>
+    <div class="footer-text">
+        Signal Intelligence Dashboard &middot; Narrative Signal Analysis
+        <br>
+        <a href="https://ivanmassow.github.io/polyhunter/">PolyHunter</a> &middot;
+        <a href="https://ivanmassow.github.io/hedgefund-tracker/">Hedge Fund Tracker</a>
+    </div>
+</footer>
+
+<script>
+// ========= DATA SOURCES =========
+const POLY_URL = "https://ivanmassow.github.io/polyhunter/summary.json";
+const HEDGE_URL = "https://ivanmassow.github.io/hedgefund-tracker/summary.json";
+
+// ========= UTILITIES =========
+function formatPnl(v) {
+    if (v === null || v === undefined || v === 0) return '<span class="pnl-flat">0.0%</span>';
+    var cls = v > 0 ? 'pnl-positive' : 'pnl-negative';
+    var sign = v > 0 ? '+' : '';
+    return '<span class="' + cls + '">' + sign + v.toFixed(1) + '%</span>';
+}
+
+function formatPrice(v) {
+    if (!v && v !== 0) return '--';
+    if (v < 1) return (v * 100).toFixed(1) + 'c';
+    return '$' + v.toFixed(2);
+}
+
+function timeAgo(isoStr) {
+    if (!isoStr) return '';
+    var d = new Date(isoStr);
+    var now = new Date();
+    var mins = Math.floor((now - d) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + 'min ago';
+    var hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + 'h ago';
+    var days = Math.floor(hrs / 24);
+    return days + 'd ago';
+}
+
+function directionBadge(dir) {
+    if (!dir) return '';
+    var d = dir.toLowerCase();
+    if (d === 'long' || d === 'higher') return '<span class="badge badge-' + d + '">' + dir.toUpperCase() + '</span>';
+    if (d === 'short' || d === 'lower') return '<span class="badge badge-' + d + '">' + dir.toUpperCase() + '</span>';
+    return '<span class="badge">' + dir + '</span>';
+}
+
+function stateBadge(state) {
+    if (!state) return '';
+    var s = state.toLowerCase();
+    var cls = 'badge-' + s;
+    return '<span class="badge ' + cls + '">' + state + '</span>';
+}
+
+function statusDot(status) {
+    var s = (status || 'grey').toLowerCase();
+    if (s === 'green') return '<span class="status-dot dot-green"></span>';
+    if (s === 'red') return '<span class="status-dot dot-red"></span>';
+    if (s === 'orange') return '<span class="status-dot dot-orange"></span>';
+    return '<span class="status-dot dot-grey"></span>';
+}
+
+function bandChip(band, bandColors) {
+    if (!band) return '';
+    var bg = (bandColors || {})[band] || '#9ea2b0';
+    return '<span class="band-chip" style="background:' + bg + '">' + band + '</span>';
+}
+
+var BAND_COLORS = {
+    "A": "#0d7680",
+    "B": "#16a34a",
+    "C": "#f59e0b",
+    "D": "#ea580c",
+    "E": "#cc0000"
+};
+
+// ========= POLY HUNTER =========
+function renderPoly(data) {
+    // Summary cards
+    document.getElementById('poly-total').textContent = data.total_candidates || 0;
+    document.getElementById('poly-winners').textContent = data.winners || 0;
+    document.getElementById('poly-losers').textContent = data.losers || 0;
+    document.getElementById('poly-winrate').textContent = (data.win_rate || 0).toFixed(1) + '%';
+    document.getElementById('poly-best').innerHTML = formatPnl(data.best_trade || 0);
+    document.getElementById('poly-updated').textContent = 'Updated ' + timeAgo(data.updated_at);
+
+    var trades = data.active_trades || [];
+    var container = document.getElementById('poly-trades');
+
+    if (trades.length === 0) {
+        container.innerHTML = '<div class="empty-state">' +
+            '<div class="empty-state-icon">&#x1F50D;</div>' +
+            '<div class="empty-state-text">No active prediction market positions</div>' +
+            '<div class="empty-state-sub">' + (data.total_candidates || 0) + ' candidates tracked &middot; ' +
+            (data.win_rate || 0).toFixed(1) + '% win rate across ' + (data.winners || 0) + ' winners</div>' +
+            '</div>';
+        return;
+    }
+
+    var html = '<div class="trade-table-wrap"><table class="trade-table"><thead><tr>';
+    html += '<th></th><th>Event</th><th>Edge</th><th>Direction</th>';
+    html += '<th>Rating</th><th>Entry</th><th>Current</th><th>P&amp;L</th>';
+    html += '</tr></thead><tbody>';
+
+    for (var i = 0; i < trades.length; i++) {
+        var t = trades[i];
+        html += '<tr>';
+        html += '<td>' + statusDot(t.status) + '</td>';
+        html += '<td class="asset-cell">' + (t.event || '--') + '</td>';
+        html += '<td><span class="badge">' + (t.edge_type || '?') + '</span></td>';
+        html += '<td>' + directionBadge(t.direction) + '</td>';
+        html += '<td>' + bandChip(t.rating, BAND_COLORS) + '</td>';
+        html += '<td style="font-family:Montserrat,sans-serif;font-size:0.82rem">' + formatPrice(t.entry_price) + '</td>';
+        html += '<td style="font-family:Montserrat,sans-serif;font-size:0.82rem">' + formatPrice(t.current_price) + '</td>';
+        html += '<td>' + formatPnl(t.pnl_pct) + '</td>';
+        html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// ========= HEDGE FUND =========
+function renderHedge(data) {
+    // Summary cards
+    document.getElementById('hedge-total').textContent = data.total_positions || 0;
+    document.getElementById('hedge-active').textContent = data.active_count || 0;
+    document.getElementById('hedge-publish').textContent = data.publish_count || 0;
+    document.getElementById('hedge-pending').textContent = data.pending_count || 0;
+    document.getElementById('hedge-directions').textContent =
+        (data.long_count || 0) + 'L / ' + (data.short_count || 0) + 'S';
+    document.getElementById('hedge-updated').textContent = 'Updated ' + timeAgo(data.updated_at);
+
+    var trades = data.active_trades || [];
+    var container = document.getElementById('hedge-trades');
+
+    if (trades.length === 0) {
+        var statusParts = [];
+        if (data.pending_count > 0) statusParts.push(data.pending_count + ' pending DD');
+        if (data.killed_count > 0) statusParts.push(data.killed_count + ' killed by analysis');
+        if (data.watch_count > 0) statusParts.push(data.watch_count + ' on watch');
+        var statusLine = statusParts.length > 0 ? statusParts.join(' &middot; ') : 'System scanning for signals';
+
+        container.innerHTML = '<div class="empty-state">' +
+            '<div class="empty-state-icon">&#x1F4CA;</div>' +
+            '<div class="empty-state-text">No active equity positions</div>' +
+            '<div class="empty-state-sub">' + statusLine + '</div>' +
+            '</div>';
+        return;
+    }
+
+    var html = '<div class="trade-table-wrap"><table class="trade-table"><thead><tr>';
+    html += '<th>State</th><th>Asset</th><th>Ticker</th><th>Dir</th>';
+    html += '<th>Band</th><th>Conf</th><th>Entry</th><th>P&amp;L</th>';
+    html += '</tr></thead><tbody>';
+
+    for (var i = 0; i < trades.length; i++) {
+        var t = trades[i];
+        html += '<tr>';
+        html += '<td>' + stateBadge(t.state) + '</td>';
+        html += '<td class="asset-cell">' + (t.asset || '--') + '</td>';
+        html += '<td class="ticker-cell">' + (t.ticker || '--') + '</td>';
+        html += '<td>' + directionBadge(t.direction) + '</td>';
+        html += '<td>' + bandChip(t.band, BAND_COLORS) + '</td>';
+        html += '<td>';
+        if (t.confidence) {
+            html += '<span class="confidence-bar-bg"><span class="confidence-bar" style="width:' +
+                Math.min(t.confidence, 100) + '%"></span></span> ';
+            html += '<span style="font-size:0.75rem;color:var(--ink-light)">' + t.confidence + '%</span>';
+        }
+        html += '</td>';
+        html += '<td style="font-family:Montserrat,sans-serif;font-size:0.82rem">' +
+            (t.entry_price ? '$' + t.entry_price.toFixed(2) : '--') + '</td>';
+        html += '<td>' + formatPnl(t.current_pnl) + '</td>';
+        html += '</tr>';
+    }
+
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+}
+
+// ========= HERO AGGREGATION =========
+function updateHero(polyData, hedgeData) {
+    var totalPoly = (polyData && polyData.total_candidates) || 0;
+    var totalHedge = (hedgeData && hedgeData.total_positions) || 0;
+    document.getElementById('hero-total').textContent = totalPoly + totalHedge;
+
+    var activePoly = (polyData && polyData.active_trades) ? polyData.active_trades.length : 0;
+    var activeHedge = (hedgeData && hedgeData.active_count) || 0;
+    document.getElementById('hero-active').textContent = activePoly + activeHedge;
+
+    // Weighted win rate from poly (hedge doesn't have enough data yet)
+    var wr = (polyData && polyData.win_rate) || 0;
+    document.getElementById('hero-winrate').textContent = wr.toFixed(1) + '%';
+    var wrEl = document.getElementById('hero-winrate');
+    wrEl.className = 'hero-stat-value ' + (wr >= 50 ? 'green' : wr > 0 ? '' : '');
+}
+
+// ========= FETCH & RENDER =========
+var polyData = null;
+var hedgeData = null;
+
+function fetchAndRender() {
+    // Fetch PolyHunter data
+    fetch(POLY_URL, { cache: 'no-cache' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            polyData = data;
+            renderPoly(data);
+            updateHero(polyData, hedgeData);
+        })
+        .catch(function(err) {
+            console.warn('PolyHunter fetch error:', err);
+            document.getElementById('poly-trades').innerHTML =
+                '<div class="empty-state"><div class="empty-state-icon">&#x26A0;&#xFE0F;</div>' +
+                '<div class="empty-state-text">Unable to load PolyHunter data</div>' +
+                '<div class="empty-state-sub">The data feed may be temporarily unavailable</div></div>';
+        });
+
+    // Fetch Hedge Fund data
+    fetch(HEDGE_URL, { cache: 'no-cache' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            hedgeData = data;
+            renderHedge(data);
+            updateHero(polyData, hedgeData);
+        })
+        .catch(function(err) {
+            console.warn('Hedge Fund fetch error:', err);
+            document.getElementById('hedge-trades').innerHTML =
+                '<div class="empty-state"><div class="empty-state-icon">&#x26A0;&#xFE0F;</div>' +
+                '<div class="empty-state-text">Unable to load Hedge Fund data</div>' +
+                '<div class="empty-state-sub">The data feed may be temporarily unavailable</div></div>';
+        });
+}
+
+// Initial load
+fetchAndRender();
+
+// Auto-refresh every 5 minutes
+setInterval(fetchAndRender, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>
