@@ -154,6 +154,38 @@ body {
 }
 .tag-poly { background: var(--teal-bg); color: var(--teal); }
 .tag-hedge { background: var(--gold-bg); color: var(--gold); }
+.tag-cw { background: #fce7f3; color: #be185d; }
+
+/* Company Watch specific */
+.cw-dual-conf {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-top: 8px;
+}
+.cw-conf-box {
+    text-align: center;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: var(--paper-dark);
+}
+.cw-conf-value {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.cw-conf-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--ink-light);
+}
+.badge-buy { background: var(--green-bg); color: var(--green); }
+.badge-sell { background: var(--red-bg); color: var(--red); }
+.badge-hold { background: var(--gold-bg); color: var(--gold); }
+.badge-fade { background: #f1f5f9; color: #9ea2b0; }
+.badge-flat { background: #f1f5f9; color: #9ea2b0; }
+.badge-duck { background: var(--gold-bg); color: var(--gold); }
 
 /* Full report button */
 .full-report-btn {
@@ -403,6 +435,7 @@ body {
     <div class="nav">
         <a href="#polyhunter">Prediction Markets</a>
         <a href="#hedgefund">Equity Signals</a>
+        <a href="#companywatch">Company Watch</a>
     </div>
     <div class="meta" id="header-meta">Signal Intelligence Dashboard</div>
 </div>
@@ -426,7 +459,7 @@ body {
                 <div class="hero-stat-label">Win Rate</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value" id="hero-systems">2</div>
+                <div class="hero-stat-value" id="hero-systems">3</div>
                 <div class="hero-stat-label">Live Systems</div>
             </div>
         </div>
@@ -522,17 +555,87 @@ body {
         <div class="last-updated" id="hedge-updated"></div>
     </section>
 
+    <!-- COMPANY WATCH SECTION -->
+    <section class="section" id="companywatch">
+        <div class="section-header">
+            <div class="section-title">
+                Company Watch
+                <span class="system-tag tag-cw">Single Stock</span>
+            </div>
+            <a class="full-report-btn" href="https://ivanmassow.github.io/company-watch/" target="_blank" style="background:#be185d">
+                View Full Report
+                <svg viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5zM5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+            </a>
+        </div>
+
+        <div class="summary-strip" id="cw-summary">
+            <div class="summary-card">
+                <div class="summary-card-value teal" id="cw-ticker">--</div>
+                <div class="summary-card-label">Ticker</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="cw-price">--</div>
+                <div class="summary-card-label">Price</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="cw-stance">--</div>
+                <div class="summary-card-label">Stance</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="cw-report-conf">--</div>
+                <div class="summary-card-label">Report Conf</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-value" id="cw-house-conf">--</div>
+                <div class="summary-card-label">House Conf</div>
+            </div>
+        </div>
+
+        <!-- Active vs Passive comparison -->
+        <div id="cw-comparison" style="display:none">
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px">
+                <div class="summary-card" style="flex:1;border-top:3px solid var(--teal)">
+                    <div class="summary-card-value" id="cw-active-pnl">--</div>
+                    <div class="summary-card-label">Active (AI)</div>
+                </div>
+                <div class="summary-card" style="flex:1;border-top:3px solid var(--gold)">
+                    <div class="summary-card-value" id="cw-passive-pnl">--</div>
+                    <div class="summary-card-label">Passive (Hold)</div>
+                </div>
+                <div class="summary-card" style="flex:1;border-top:3px solid var(--ink)">
+                    <div class="summary-card-value" id="cw-alpha">--</div>
+                    <div class="summary-card-label">Alpha</div>
+                </div>
+                <div class="summary-card" style="flex:1">
+                    <div class="summary-card-value" id="cw-trades">--</div>
+                    <div class="summary-card-label">Trades</div>
+                </div>
+                <div class="summary-card" style="flex:1">
+                    <div class="summary-card-value" id="cw-winrate">--</div>
+                    <div class="summary-card-label">Win Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="cw-details">
+            <div class="loading-state"><span class="loading-spinner"></span> Loading Company Watch data&hellip;</div>
+        </div>
+
+        <div class="last-updated" id="cw-updated"></div>
+    </section>
+
 </main>
 </div>
 
 <!-- FOOTER -->
 <footer class="footer">
-    <div class="logo">NOAH</div>
+    <a href="https://ivanmassow.github.io/noah-dashboard/" style="text-decoration:none"><div class="logo">NOAH</div></a>
     <div class="footer-text">
         Narrative Signal Analysis &middot; Information Asymmetry Intelligence
         <br>
         <a href="https://ivanmassow.github.io/polyhunter/">PolyHunter</a> &middot;
-        <a href="https://ivanmassow.github.io/hedgefund-tracker/">Hedge Fund Tracker</a>
+        <a href="https://ivanmassow.github.io/hedgefund-tracker/">Hedge Fund Tracker</a> &middot;
+        <a href="https://ivanmassow.github.io/company-watch/">Company Watch</a>
     </div>
 </footer>
 
@@ -540,6 +643,7 @@ body {
 // ========= DATA SOURCES =========
 var POLY_URL = "https://ivanmassow.github.io/polyhunter/summary.json";
 var HEDGE_URL = "https://ivanmassow.github.io/hedgefund-tracker/summary.json";
+var CW_URL = "https://ivanmassow.github.io/company-watch/summary.json";
 
 // ========= UTILITIES =========
 function formatPnl(v) {
@@ -708,11 +812,72 @@ function renderHedge(data) {
     container.innerHTML = html;
 }
 
+// ========= COMPANY WATCH =========
+function renderCW(data) {
+    document.getElementById('cw-ticker').textContent = data.ticker || '--';
+    document.getElementById('cw-price').textContent = data.current_price ? '$' + data.current_price.toFixed(2) : '--';
+
+    var stance = (data.active && data.active.stance) || 'FLAT';
+    var stanceEl = document.getElementById('cw-stance');
+    stanceEl.innerHTML = '<span class="badge badge-' + stance.toLowerCase() + '">' + stance + '</span>';
+
+    var rConf = (data.active && data.active.report_confidence) || 0;
+    var hConf = (data.active && data.active.house_confidence) || 0;
+    document.getElementById('cw-report-conf').textContent = rConf ? rConf.toFixed(0) + '%' : '--';
+    document.getElementById('cw-house-conf').textContent = hConf ? hConf.toFixed(0) + '%' : '--';
+
+    // Color the house confidence based on divergence from report
+    var hEl = document.getElementById('cw-house-conf');
+    if (hConf > rConf + 5) hEl.className = 'summary-card-value green';
+    else if (hConf < rConf - 5) hEl.className = 'summary-card-value red';
+    else hEl.className = 'summary-card-value teal';
+
+    // Active vs Passive comparison
+    var compDiv = document.getElementById('cw-comparison');
+    compDiv.style.display = '';
+
+    var aPnl = (data.active && data.active.unrealised_pnl) || 0;
+    var pPnl = (data.passive && data.passive.pnl) || 0;
+    var alpha = data.alpha || 0;
+
+    document.getElementById('cw-active-pnl').innerHTML = formatPnl(aPnl);
+    document.getElementById('cw-passive-pnl').innerHTML = formatPnl(pPnl);
+    document.getElementById('cw-alpha').innerHTML = formatPnl(alpha);
+    document.getElementById('cw-trades').textContent = data.total_trades || 0;
+    document.getElementById('cw-winrate').textContent = (data.win_rate || 0).toFixed(1) + '%';
+
+    document.getElementById('cw-updated').textContent = 'Updated ' + timeAgo(data.generated_at);
+
+    // Show state and ducking status
+    var details = document.getElementById('cw-details');
+    var state = (data.active && data.active.state) || 'FLAT';
+    var isDucking = data.active && data.active.is_ducking;
+    var daysTracked = data.days_tracked || 0;
+
+    var html = '<div class="trade-table-wrap"><table class="trade-table"><thead><tr>';
+    html += '<th>Ticker</th><th>State</th><th>Direction</th><th>Entry</th><th>Active P&L</th><th>Passive P&L</th><th>Alpha</th><th>Days</th>';
+    html += '</tr></thead><tbody>';
+    html += '<tr>';
+    html += '<td class="ticker-cell">' + escHtml(data.ticker) + '</td>';
+    html += '<td>' + stateBadge(state) + (isDucking ? ' <span class="badge badge-duck">DUCK</span>' : '') + '</td>';
+    html += '<td>' + directionBadge(data.active && data.active.direction || '') + '</td>';
+    html += '<td style="font-family:Montserrat,sans-serif;font-size:0.8rem">' +
+        (data.active && data.active.entry_price ? '$' + data.active.entry_price.toFixed(2) : '--') + '</td>';
+    html += '<td>' + formatPnl(aPnl) + '</td>';
+    html += '<td>' + formatPnl(pPnl) + '</td>';
+    html += '<td>' + formatPnl(alpha) + '</td>';
+    html += '<td>' + daysTracked + '</td>';
+    html += '</tr>';
+    html += '</tbody></table></div>';
+    details.innerHTML = html;
+}
+
 // ========= HERO AGGREGATION =========
-function updateHero(polyData, hedgeData) {
+function updateHero(polyData, hedgeData, cwData) {
     var totalPoly = (polyData && polyData.total_candidates) || 0;
     var totalHedge = (hedgeData && hedgeData.total_positions) || 0;
-    document.getElementById('hero-total').textContent = totalPoly + totalHedge;
+    var totalCW = cwData ? 1 : 0;
+    document.getElementById('hero-total').textContent = totalPoly + totalHedge + totalCW;
 
     var activeHedge = (hedgeData && hedgeData.active_count) || 0;
     var activePoly = 0;
@@ -721,7 +886,8 @@ function updateHero(polyData, hedgeData) {
             if (polyData.recent_positions[i].state === 'ACTIVE') activePoly++;
         }
     }
-    document.getElementById('hero-active').textContent = activePoly + activeHedge;
+    var activeCW = (cwData && cwData.active && cwData.active.state === 'HELD') ? 1 : 0;
+    document.getElementById('hero-active').textContent = activePoly + activeHedge + activeCW;
 
     var wr = (polyData && polyData.win_rate) || 0;
     var wrEl = document.getElementById('hero-winrate');
@@ -732,6 +898,7 @@ function updateHero(polyData, hedgeData) {
 // ========= FETCH & RENDER =========
 var polyData = null;
 var hedgeData = null;
+var cwData = null;
 
 function fetchAndRender() {
     fetch(POLY_URL, { cache: 'no-cache' })
@@ -739,7 +906,7 @@ function fetchAndRender() {
         .then(function(data) {
             polyData = data;
             renderPoly(data);
-            updateHero(polyData, hedgeData);
+            updateHero(polyData, hedgeData, cwData);
         })
         .catch(function(err) {
             console.warn('PolyHunter fetch error:', err);
@@ -752,12 +919,25 @@ function fetchAndRender() {
         .then(function(data) {
             hedgeData = data;
             renderHedge(data);
-            updateHero(polyData, hedgeData);
+            updateHero(polyData, hedgeData, cwData);
         })
         .catch(function(err) {
             console.warn('Hedge Fund fetch error:', err);
             document.getElementById('hedge-trades').innerHTML =
                 '<div class="loading-state" style="opacity:0.5">Unable to load Hedge Fund data</div>';
+        });
+
+    fetch(CW_URL, { cache: 'no-cache' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            cwData = data;
+            renderCW(data);
+            updateHero(polyData, hedgeData, cwData);
+        })
+        .catch(function(err) {
+            console.warn('Company Watch fetch error:', err);
+            document.getElementById('cw-details').innerHTML =
+                '<div class="loading-state" style="opacity:0.5">Unable to load Company Watch data</div>';
         });
 }
 
