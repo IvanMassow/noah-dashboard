@@ -455,8 +455,16 @@ body {
                 <div class="hero-stat-label">Active Trades</div>
             </div>
             <div class="hero-stat">
-                <div class="hero-stat-value" id="hero-winrate">--</div>
-                <div class="hero-stat-label">Win Rate</div>
+                <div class="hero-stat-value" id="hero-wr-poly">--</div>
+                <div class="hero-stat-label">PolyHunter WR</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value" id="hero-wr-hedge">--</div>
+                <div class="hero-stat-label">Hedge Fund WR</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value" id="hero-wr-cw">--</div>
+                <div class="hero-stat-label">Company Watch WR</div>
             </div>
             <div class="hero-stat">
                 <div class="hero-stat-value" id="hero-systems">3</div>
@@ -889,19 +897,20 @@ function updateHero(polyData, hedgeData, cwData) {
     var activeCW = (cwData && cwData.active && cwData.active.state === 'HELD') ? 1 : 0;
     document.getElementById('hero-active').textContent = activePoly + activeHedge + activeCW;
 
-    // Blended win rate across all systems
-    var wrPoly = (polyData && polyData.win_rate) || 0;
-    var wrHedge = (hedgeData && hedgeData.win_rate) || 0;
-    var wrCW = (cwData && cwData.win_rate) || 0;
-    var wrCount = 0;
-    var wrSum = 0;
-    if (wrPoly > 0) { wrSum += wrPoly; wrCount++; }
-    if (wrHedge > 0) { wrSum += wrHedge; wrCount++; }
-    if (wrCW > 0) { wrSum += wrCW; wrCount++; }
-    var wr = wrCount > 0 ? wrSum / wrCount : 0;
-    var wrEl = document.getElementById('hero-winrate');
-    wrEl.textContent = wr.toFixed(1) + '%';
-    wrEl.className = 'hero-stat-value ' + (wr >= 50 ? 'green' : wr > 0 ? '' : '');
+    // Individual win rates per system
+    function setWR(id, val) {
+        var el = document.getElementById(id);
+        if (val > 0) {
+            el.textContent = val.toFixed(1) + '%';
+            el.className = 'hero-stat-value ' + (val >= 50 ? 'green' : '');
+        } else {
+            el.textContent = '--';
+            el.className = 'hero-stat-value';
+        }
+    }
+    setWR('hero-wr-poly', (polyData && polyData.win_rate) || 0);
+    setWR('hero-wr-hedge', (hedgeData && hedgeData.win_rate) || 0);
+    setWR('hero-wr-cw', (cwData && cwData.win_rate) || 0);
 }
 
 // ========= FETCH & RENDER =========
