@@ -599,28 +599,48 @@ body {
             </div>
         </div>
 
-        <!-- Active vs Passive comparison -->
+        <!-- Active vs Do Nothing comparison -->
         <div id="cw-comparison" style="display:none">
-            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px">
-                <div class="summary-card" style="flex:1;border-top:3px solid var(--teal)">
-                    <div class="summary-card-value" id="cw-active-pnl">--</div>
-                    <div class="summary-card-label">Active (AI)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
+                <!-- Active (AI) column -->
+                <div class="summary-card" style="border-top:3px solid var(--teal);padding:16px 18px">
+                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--teal)">Active (AI-Managed)</div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Today</span>
+                        <span class="summary-card-value" id="cw-active-daily" style="font-size:1rem">--</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Total</span>
+                        <span class="summary-card-value" id="cw-active-total" style="font-size:1.2rem">--</span>
+                    </div>
                 </div>
-                <div class="summary-card" style="flex:1;border-top:3px solid var(--gold)">
-                    <div class="summary-card-value" id="cw-passive-pnl">--</div>
-                    <div class="summary-card-label">Passive (Hold)</div>
+                <!-- Do Nothing column -->
+                <div class="summary-card" style="border-top:3px solid var(--gold);padding:16px 18px">
+                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--gold)">Do Nothing (Hold)</div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Today</span>
+                        <span class="summary-card-value" id="cw-passive-daily" style="font-size:1rem">--</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Total</span>
+                        <span class="summary-card-value" id="cw-passive-total" style="font-size:1.2rem">--</span>
+                    </div>
                 </div>
-                <div class="summary-card" style="flex:1;border-top:3px solid var(--ink)">
-                    <div class="summary-card-value" id="cw-alpha">--</div>
-                    <div class="summary-card-label">Alpha</div>
-                </div>
-                <div class="summary-card" style="flex:1">
-                    <div class="summary-card-value" id="cw-trades">--</div>
-                    <div class="summary-card-label">Trades</div>
-                </div>
-                <div class="summary-card" style="flex:1">
-                    <div class="summary-card-value" id="cw-winrate">--</div>
-                    <div class="summary-card-label">Win Rate</div>
+                <!-- Alpha + Stats column -->
+                <div class="summary-card" style="border-top:3px solid var(--ink);padding:16px 18px">
+                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--ink)">Alpha &amp; Stats</div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Alpha</span>
+                        <span class="summary-card-value" id="cw-alpha" style="font-size:1.2rem">--</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Trades</span>
+                        <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:0.9rem" id="cw-trades">--</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Win Rate</span>
+                        <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:0.9rem" id="cw-winrate">--</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -840,30 +860,40 @@ function renderCW(data) {
     else if (hConf < rConf - 5) hEl.className = 'summary-card-value red';
     else hEl.className = 'summary-card-value teal';
 
-    // Active vs Passive comparison
+    // Active vs Do Nothing comparison
     var compDiv = document.getElementById('cw-comparison');
     compDiv.style.display = '';
 
-    var aPnl = (data.active && data.active.unrealised_pnl) || 0;
-    var pPnl = (data.passive && data.passive.pnl) || 0;
+    // Daily change (today)
+    var aDailyPnl = (data.active && data.active.daily_pnl) || 0;
+    var pDailyPnl = (data.passive && data.passive.daily_pnl) || 0;
+
+    // Total cumulative P&L
+    var aTotalPnl = (data.active && data.active.total_pnl) || 0;
+    var pTotalPnl = (data.passive && data.passive.pnl) || 0;
     var alpha = data.alpha || 0;
 
-    document.getElementById('cw-active-pnl').innerHTML = formatPnl(aPnl);
-    document.getElementById('cw-passive-pnl').innerHTML = formatPnl(pPnl);
+    document.getElementById('cw-active-daily').innerHTML = formatPnl(aDailyPnl);
+    document.getElementById('cw-active-total').innerHTML = formatPnl(aTotalPnl);
+    document.getElementById('cw-passive-daily').innerHTML = formatPnl(pDailyPnl);
+    document.getElementById('cw-passive-total').innerHTML = formatPnl(pTotalPnl);
     document.getElementById('cw-alpha').innerHTML = formatPnl(alpha);
     document.getElementById('cw-trades').textContent = data.total_trades || 0;
     document.getElementById('cw-winrate').textContent = (data.win_rate || 0).toFixed(1) + '%';
 
     document.getElementById('cw-updated').textContent = 'Updated ' + timeAgo(data.generated_at);
 
-    // Show state and ducking status
+    // Show state and ducking status in detail table
     var details = document.getElementById('cw-details');
     var state = (data.active && data.active.state) || 'FLAT';
     var isDucking = data.active && data.active.is_ducking;
     var daysTracked = data.days_tracked || 0;
 
     var html = '<div class="trade-table-wrap"><table class="trade-table"><thead><tr>';
-    html += '<th>Ticker</th><th>State</th><th>Direction</th><th>Entry</th><th>Active P&L</th><th>Passive P&L</th><th>Alpha</th><th>Days</th>';
+    html += '<th>Ticker</th><th>State</th><th>Direction</th><th>Entry</th>';
+    html += '<th>Today (AI)</th><th>Today (Hold)</th>';
+    html += '<th>Total (AI)</th><th>Total (Hold)</th>';
+    html += '<th>Alpha</th><th>Days</th>';
     html += '</tr></thead><tbody>';
     html += '<tr>';
     html += '<td class="ticker-cell">' + escHtml(data.ticker) + '</td>';
@@ -871,8 +901,10 @@ function renderCW(data) {
     html += '<td>' + directionBadge(data.active && data.active.direction || '') + '</td>';
     html += '<td style="font-family:Montserrat,sans-serif;font-size:0.8rem">' +
         (data.active && data.active.entry_price ? '$' + data.active.entry_price.toFixed(2) : '--') + '</td>';
-    html += '<td>' + formatPnl(aPnl) + '</td>';
-    html += '<td>' + formatPnl(pPnl) + '</td>';
+    html += '<td>' + formatPnl(aDailyPnl) + '</td>';
+    html += '<td>' + formatPnl(pDailyPnl) + '</td>';
+    html += '<td>' + formatPnl(aTotalPnl) + '</td>';
+    html += '<td>' + formatPnl(pTotalPnl) + '</td>';
     html += '<td>' + formatPnl(alpha) + '</td>';
     html += '<td>' + daysTracked + '</td>';
     html += '</tr>';
