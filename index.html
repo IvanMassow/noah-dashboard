@@ -166,30 +166,53 @@ body {
 .tag-hedge { background: var(--gold-bg); color: var(--gold); }
 .tag-cw { background: #fce7f3; color: #be185d; }
 
-/* Company Watch specific */
-.cw-dual-conf {
-    display: flex;
+/* Company Watch stock tiles */
+.cw-stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
+    margin-bottom: 18px;
+}
+.cw-tile {
+    background: white;
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-top: 4px solid #be185d;
+    transition: transform 0.15s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+.cw-tile:hover { transform: translateY(-2px); }
+.cw-tile-head {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-top: 8px;
+    margin-bottom: 10px;
 }
-.cw-conf-box {
-    text-align: center;
-    padding: 6px 14px;
-    border-radius: 6px;
-    background: var(--paper-dark);
-}
-.cw-conf-value {
+.cw-tile-ticker {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
     font-weight: 700;
+    font-size: 1.3em;
+    color: #be185d;
 }
-.cw-conf-label {
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+.cw-tile-company {
+    font-size: 0.78em;
     color: var(--ink-light);
 }
+.cw-tile-price {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.7em;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.cw-tile-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 0.82em;
+}
+.cw-tile-stats span { color: var(--ink-light); }
 .badge-buy { background: var(--green-bg); color: var(--green); }
 .badge-sell { background: var(--red-bg); color: var(--red); }
 .badge-hold { background: var(--gold-bg); color: var(--gold); }
@@ -613,84 +636,15 @@ body {
         <div class="section-header">
             <div class="section-title">
                 Company Watch
-                <span class="system-tag tag-cw">Single Stock</span>
+                <span class="system-tag tag-cw">Stock Intelligence</span>
             </div>
             <a class="full-report-btn" href="https://ivanmassow.github.io/company-watch/" target="_blank" style="background:#be185d">
-                View Full Report
+                View All Reports
                 <svg viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5zM5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
             </a>
         </div>
 
-        <div class="summary-strip" id="cw-summary">
-            <div class="summary-card">
-                <div class="summary-card-value teal" id="cw-ticker">--</div>
-                <div class="summary-card-label">Ticker</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="cw-price">--</div>
-                <div class="summary-card-label">Price</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="cw-stance">--</div>
-                <div class="summary-card-label">Stance</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="cw-report-conf">--</div>
-                <div class="summary-card-label">Report Conf</div>
-            </div>
-            <div class="summary-card">
-                <div class="summary-card-value" id="cw-house-conf">--</div>
-                <div class="summary-card-label">House Conf</div>
-            </div>
-        </div>
-
-        <!-- Active vs Do Nothing comparison -->
-        <div id="cw-comparison" style="display:none">
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:18px">
-                <!-- Active (AI) column -->
-                <div class="summary-card" style="border-top:3px solid var(--teal);padding:16px 18px">
-                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--teal)">Active (AI-Managed)</div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Today</span>
-                        <span class="summary-card-value" id="cw-active-daily" style="font-size:1rem">--</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Total</span>
-                        <span class="summary-card-value" id="cw-active-total" style="font-size:1.2rem">--</span>
-                    </div>
-                </div>
-                <!-- Do Nothing column -->
-                <div class="summary-card" style="border-top:3px solid var(--gold);padding:16px 18px">
-                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--gold)">Do Nothing (Hold)</div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Today</span>
-                        <span class="summary-card-value" id="cw-passive-daily" style="font-size:1rem">--</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Total</span>
-                        <span class="summary-card-value" id="cw-passive-total" style="font-size:1.2rem">--</span>
-                    </div>
-                </div>
-                <!-- Alpha + Stats column -->
-                <div class="summary-card" style="border-top:3px solid var(--ink);padding:16px 18px">
-                    <div class="summary-card-label" style="margin-bottom:10px;font-size:0.72rem;font-weight:700;letter-spacing:1px;color:var(--ink)">Alpha &amp; Stats</div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Alpha</span>
-                        <span class="summary-card-value" id="cw-alpha" style="font-size:1.2rem">--</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Trades</span>
-                        <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:0.9rem" id="cw-trades">--</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span style="font-size:0.72rem;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.5px">Win Rate</span>
-                        <span style="font-family:Montserrat,sans-serif;font-weight:700;font-size:0.9rem" id="cw-winrate">--</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="cw-details">
+        <div class="cw-stock-grid" id="cw-tiles">
             <div class="loading-state"><span class="loading-spinner"></span> Loading Company Watch data&hellip;</div>
         </div>
 
@@ -918,82 +872,68 @@ function renderHedge(data) {
 }
 
 // ========= COMPANY WATCH =========
+function stanceBadgeColor(stance) {
+    var s = (stance || '').toLowerCase();
+    if (s === 'buy') return 'background:#dcfce7;color:#16a34a';
+    if (s === 'sell') return 'background:#fef2f2;color:#cc0000';
+    if (s === 'hold') return 'background:#fef3c7;color:#d97706';
+    return 'background:#f1f5f9;color:#9ea2b0';
+}
+
 function renderCW(data) {
-    document.getElementById('cw-ticker').textContent = data.ticker || '--';
-    document.getElementById('cw-price').textContent = data.current_price ? '$' + data.current_price.toFixed(2) : '--';
-
-    var stance = (data.active && data.active.stance) || 'FLAT';
-    var stanceEl = document.getElementById('cw-stance');
-    stanceEl.innerHTML = '<span class="badge badge-' + stance.toLowerCase() + '">' + stance + '</span>';
-
-    var rConf = (data.active && data.active.report_confidence) || 0;
-    var hConf = (data.active && data.active.house_confidence) || 0;
-    document.getElementById('cw-report-conf').textContent = rConf ? rConf.toFixed(0) + '%' : '--';
-    document.getElementById('cw-house-conf').textContent = hConf ? hConf.toFixed(0) + '%' : '--';
-
-    // Color the house confidence based on divergence from report
-    var hEl = document.getElementById('cw-house-conf');
-    if (hConf > rConf + 5) hEl.className = 'summary-card-value green';
-    else if (hConf < rConf - 5) hEl.className = 'summary-card-value red';
-    else hEl.className = 'summary-card-value teal';
-
-    // Active vs Do Nothing comparison
-    var compDiv = document.getElementById('cw-comparison');
-    compDiv.style.display = '';
-
-    // Daily change (today)
-    var aDailyPnl = (data.active && data.active.daily_pnl) || 0;
-    var pDailyPnl = (data.passive && data.passive.daily_pnl) || 0;
-
-    // Total cumulative P&L
-    var aTotalPnl = (data.active && data.active.total_pnl) || 0;
-    var pTotalPnl = (data.passive && data.passive.pnl) || 0;
-    var alpha = data.alpha || 0;
-
-    document.getElementById('cw-active-daily').innerHTML = formatPnl(aDailyPnl);
-    document.getElementById('cw-active-total').innerHTML = formatPnl(aTotalPnl);
-    document.getElementById('cw-passive-daily').innerHTML = formatPnl(pDailyPnl);
-    document.getElementById('cw-passive-total').innerHTML = formatPnl(pTotalPnl);
-    document.getElementById('cw-alpha').innerHTML = formatPnl(alpha);
-    document.getElementById('cw-trades').textContent = data.total_trades || 0;
-    document.getElementById('cw-winrate').textContent = (data.win_rate || 0).toFixed(1) + '%';
-
     document.getElementById('cw-updated').textContent = 'Updated ' + timeAgo(data.generated_at);
 
-    // Show state and ducking status in detail table
-    var details = document.getElementById('cw-details');
-    var state = (data.active && data.active.state) || 'FLAT';
-    var isDucking = data.active && data.active.is_ducking;
-    var daysTracked = data.days_tracked || 0;
+    var stocks = data.stocks || [];
+    var container = document.getElementById('cw-tiles');
 
-    var html = '<div class="trade-table-wrap"><table class="trade-table"><thead><tr>';
-    html += '<th>Ticker</th><th>State</th><th>Direction</th><th>Entry</th>';
-    html += '<th>Today (AI)</th><th>Today (Hold)</th>';
-    html += '<th>Total (AI)</th><th>Total (Hold)</th>';
-    html += '<th>Alpha</th><th>Days</th>';
-    html += '</tr></thead><tbody>';
-    html += '<tr>';
-    html += '<td class="ticker-cell">' + escHtml(data.ticker) + '</td>';
-    html += '<td>' + stateBadge(state) + (isDucking ? ' <span class="badge badge-duck">DUCK</span>' : '') + '</td>';
-    html += '<td>' + directionBadge(data.active && data.active.direction || '') + '</td>';
-    html += '<td style="font-family:Montserrat,sans-serif;font-size:0.8rem">' +
-        (data.active && data.active.entry_price ? '$' + data.active.entry_price.toFixed(2) : '--') + '</td>';
-    html += '<td>' + formatPnl(aDailyPnl) + '</td>';
-    html += '<td>' + formatPnl(pDailyPnl) + '</td>';
-    html += '<td>' + formatPnl(aTotalPnl) + '</td>';
-    html += '<td>' + formatPnl(pTotalPnl) + '</td>';
-    html += '<td>' + formatPnl(alpha) + '</td>';
-    html += '<td>' + daysTracked + '</td>';
-    html += '</tr>';
-    html += '</tbody></table></div>';
-    details.innerHTML = html;
+    if (stocks.length === 0) {
+        // Backward compat: single-stock format
+        if (data.ticker) {
+            stocks = [data];
+        } else {
+            container.innerHTML = '<div class="loading-state" style="opacity:0.6">No data available yet</div>';
+            return;
+        }
+    }
+
+    var html = '';
+    for (var i = 0; i < stocks.length; i++) {
+        var s = stocks[i];
+        var stance = (s.active && s.active.stance) || 'FLAT';
+        var rConf = (s.active && s.active.report_confidence) || 0;
+        var hConf = (s.active && s.active.house_confidence) || 0;
+        var alpha = s.alpha || 0;
+        var alphaColor = alpha > 0 ? '#16a34a' : (alpha < 0 ? '#cc0000' : '#9ea2b0');
+        var price = s.current_price ? '$' + s.current_price.toFixed(2) : '--';
+        var isDucking = s.active && s.active.is_ducking;
+
+        html += '<a class="cw-tile" href="https://ivanmassow.github.io/company-watch/reports/' + escHtml(s.ticker) + '/latest.html">';
+        html += '<div class="cw-tile-head">';
+        html += '<div>';
+        html += '<div class="cw-tile-ticker">' + escHtml(s.ticker) + '</div>';
+        html += '<div class="cw-tile-company">' + escHtml(s.company || s.ticker) + '</div>';
+        html += '</div>';
+        html += '<span class="badge" style="' + stanceBadgeColor(stance) + ';padding:4px 12px;border-radius:20px;font-family:Montserrat,sans-serif;font-weight:700;font-size:0.82em">' + stance + '</span>';
+        if (isDucking) html += ' <span class="badge badge-duck" style="margin-left:4px">DUCK</span>';
+        html += '</div>';
+        html += '<div class="cw-tile-price">' + price + '</div>';
+        html += '<div class="cw-tile-stats">';
+        html += '<div><span>Report:</span> <strong>' + (rConf ? rConf.toFixed(0) + '%' : '--') + '</strong></div>';
+        html += '<div><span>House:</span> <strong>' + (hConf ? hConf.toFixed(0) + '%' : '--') + '</strong></div>';
+        html += '<div><span>Alpha:</span> <strong style="color:' + alphaColor + '">' + (alpha > 0 ? '+' : '') + alpha.toFixed(2) + '%</strong></div>';
+        html += '</div>';
+        html += '</a>';
+    }
+
+    container.innerHTML = html;
 }
 
 // ========= HERO AGGREGATION =========
 function updateHero(polyData, hedgeData, cwData) {
     var totalPoly = (polyData && polyData.total_candidates) || 0;
     var totalHedge = (hedgeData && hedgeData.total_positions) || 0;
-    var totalCW = cwData ? 1 : 0;
+    var cwStocks = (cwData && cwData.stocks) || [];
+    var totalCW = cwStocks.length || (cwData && cwData.ticker ? 1 : 0);
     document.getElementById('hero-total').textContent = totalPoly + totalHedge + totalCW;
 
     var activeHedge = (hedgeData && hedgeData.active_count) || 0;
@@ -1003,7 +943,11 @@ function updateHero(polyData, hedgeData, cwData) {
             if (polyData.recent_positions[i].state === 'ACTIVE') activePoly++;
         }
     }
-    var activeCW = (cwData && cwData.active && cwData.active.state === 'HELD') ? 1 : 0;
+    var activeCW = 0;
+    for (var j = 0; j < cwStocks.length; j++) {
+        if (cwStocks[j].active && cwStocks[j].active.state === 'HELD') activeCW++;
+    }
+    if (activeCW === 0 && cwData && cwData.active && cwData.active.state === 'HELD') activeCW = 1;
     document.getElementById('hero-active').textContent = activePoly + activeHedge + activeCW;
 
     // Individual win rates per system
